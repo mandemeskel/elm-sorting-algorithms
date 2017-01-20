@@ -3,6 +3,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import List
 import String
+import Regex
 
 {-
 Mergesort : List Int Int -> List
@@ -18,25 +19,31 @@ main = Html.beginnerProgram{ model = model, view = view, update = update }
 -- Model
 
 
--- the list we will be sorting
-type alias Model = { array : List }
-model = { array = [] }
+-- create our sorting list type
+type alias SortArray = List Char
+
+-- the list we will be sorting, 
+type alias Model = { array : SortArray, user_input : String }
+model = { array = [], user_input = "" }
 
 
 -- UPDATE
 
 
-type Msg = MergeSort List
+type Msg = MergeSort String
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    MergeSort unsortedArray -> { model | array = unsortedArray }
+    MergeSort unsorted_array -> { 
+     array = Regex.split Regex.All (Regex.regex ",") unsorted_array,
+     user_input = unsorted_array
+     }
     
     
 -- VIEW
 
-view : Model -> Html Msg
+view : Model -> Html (String -> Msg)
 view model = div
 -- attributes
   []
@@ -53,5 +60,5 @@ view model = div
   -- NOTE: fromList expects a list of chars
   -- TODO: most convert elements from Int to Char, http://package.elm-lang.org/packages/elm-lang/core/latest/List
   -- label [] [ text( String.fromList( model.array ) ) ]
+  label [] [ text( String.fromList( model.array ) ) ]
   ]
-

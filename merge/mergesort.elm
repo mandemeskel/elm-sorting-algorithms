@@ -23,27 +23,27 @@ main = Html.beginnerProgram{ model = model, view = view, update = update }
 type alias SortArray = List Char
 
 -- the list we will be sorting, 
-type alias Model = { array : SortArray, user_input : String }
-model = { array = [], user_input = "" }
+type alias Model = { user_input : String }
+model : Model
+model = { user_input = "" }
 
 
 -- UPDATE
 
 
-type Msg = MergeSort String
+type Msg = SetModel String
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    MergeSort unsorted_array -> { 
-     array = Regex.split Regex.All (Regex.regex ",") unsorted_array,
-     user_input = unsorted_array
+    SetModel unsorted_array -> { 
+     model | user_input = unsorted_array
      }
     
     
 -- VIEW
 
-view : Model -> Html (String -> Msg)
+view : Model -> Html Msg
 view model = div
 -- attributes
   []
@@ -53,12 +53,12 @@ view model = div
   -- NOTE: type is a taken keyword, if you want to set the attribute type, use type_
   -- input [ type( "number" ) ] [],
   input [ type_( "number" ) ] [],
-  input [ type_( "submit" ), onClick( MergeSort ) ] [ text( "sort" ) ],
+  input [ type_( "submit" ), onClick( SetModel ) ] [ text( "sort" ) ]
   -- NOTE: Elm wont automatically cast everything into a printable format
   -- NOTE: Elm's text function expects a string most get string from list
   -- label [] [ text( model.array ) ]
   -- NOTE: fromList expects a list of chars
   -- TODO: most convert elements from Int to Char, http://package.elm-lang.org/packages/elm-lang/core/latest/List
   -- label [] [ text( String.fromList( model.array ) ) ]
-  label [] [ text( String.fromList( model.array ) ) ]
+  -- label [] [ text( model.user_input ) ]
   ]

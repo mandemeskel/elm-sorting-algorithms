@@ -92,45 +92,75 @@ getSubArray array start stop =
     List.take (stop - start) (List.drop start array)
 
 
-mergeArrays aleft aright =
-    []
-
-
 
 {--
   Merge sort
 --}
 
 
-mergeSort : List a -> List a
-mergeSort a =
-    if List.length a > 1 then
-        mergeArrays (mergeSort (splitInHalf a Left)) (mergeSort (splitInHalf a Right))
+mergeSort : List Int -> List Int
+mergeSort array =
+    if List.length array > 1 then
+        -- mergeArrays (mergeSort (splitInHalf a Left)) (mergeSort (splitInHalf a Right))
         -- aleft = mergeSort ( splitInHalf a Left )
         -- aright = mergeSort ( splitInHalf a Right )
         -- mergeArrays aleft aright
+        let
+            len =
+                List.length array
+
+            aleft =
+                mergeSort (getSubArray array 0 (len // 2))
+
+            aright =
+                mergeSort (getSubArray array (len // 2) 0)
+        in
+            mergeArrays aleft aright
     else
-        a
+        array
+
+
+lessThan : Int -> Int -> Int
+lessThan val1 val2 =
+    if val1 > val2 then
+        val1
+    else
+        val2
+
+
+mergeArrays : List Int -> List Int -> List Int
+mergeArrays aleft aright =
+    List.map2 lessThan aleft aright
 
 
 array =
-    [ 1, 2, 3, 4, 5, 6 ]
+    [ 1, 2, 3, 4, 5, 6, 7 ]
 
 
 start =
-    -- List.length array // 2
-    -- 0
-    2
+    List.length array // 2
+
+
+
+-- 0
+-- 2
 
 
 stop =
-    -- List.length array
-    -- List.length array // 2
-    5
+    List.length array
+
+
+
+-- List.length array // 2
+-- 5
 
 
 result =
     getSubArray array start stop
+
+
+merged =
+    mergeArrays [ 1, 2, 4 ] [ 0, 3, 5 ]
 
 
 
@@ -138,4 +168,5 @@ result =
 
 
 main =
-    Html.text ((toString result) ++ " " ++ (toString array))
+    -- Html.text ((toString result) ++ " " ++ (toString array))
+    Html.text (toString merged)

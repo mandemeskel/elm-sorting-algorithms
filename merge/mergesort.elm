@@ -1,64 +1,87 @@
-import Html exposing (Html, Attribute, div, text, input, label)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+module Main exposing (..)
+
+import Html
 import List
-import String
-import Regex
-
-{-
-Mergesort : List Int Int -> List
--- Mergesort : array start radius =
-Mergesort : radius start array = 
-  radius = List.length array // 2
-  start = 0
--}
-
-main = Html.beginnerProgram{ model = model, view = view, update = update }
 
 
--- Model
+type Direction
+    = Left
+    | Right
 
 
--- create our sorting list type
-type alias SortArray = List Char
-
--- the list we will be sorting, 
-type alias Model = { user_input : String }
-model : Model
-model = { user_input = "" }
+unsorted =
+    [ 4, 3, 2, 1 ]
 
 
--- UPDATE
+
+-- returns middle and all elements to the left of it
 
 
-type Msg = SetModel String
+firstHalf : List a -> List a
+firstHalf =
+    List.reverse >> lastHalf >> List.reverse
 
-update : Msg -> Model -> Model
-update msg model =
-  case msg of
-    SetModel unsorted_array -> { 
-     model | user_input = unsorted_array
-     }
-    
-    
--- VIEW
 
-view : Model -> Html Msg
-view model = div
--- attributes
-  []
--- children
-  [
-  label [] [ text( "enter a comma separated list of numebrs to sort" ) ],
-  -- NOTE: type is a taken keyword, if you want to set the attribute type, use type_
-  -- input [ type( "number" ) ] [],
-  input [ type_( "number" ) ] [],
-  input [ type_( "submit" ), onClick( SetModel ) ] [ text( "sort" ) ]
-  -- NOTE: Elm wont automatically cast everything into a printable format
-  -- NOTE: Elm's text function expects a string most get string from list
-  -- label [] [ text( model.array ) ]
-  -- NOTE: fromList expects a list of chars
-  -- TODO: most convert elements from Int to Char, http://package.elm-lang.org/packages/elm-lang/core/latest/List
-  -- label [] [ text( String.fromList( model.array ) ) ]
-  -- label [] [ text( model.user_input ) ]
-  ]
+
+-- returns middle and all elements to the right of it
+-- lastHalf : List -> List, causes an error when using List.length function
+-- elm thinks a is List and not List a????
+
+
+lastHalf : List a -> List a
+lastHalf a =
+    let
+        len =
+            (List.length a)
+    in
+        if len % 2 == 0 then
+            List.drop (len // 2) a
+        else
+            List.drop ((len // 2) - 1) a
+
+
+
+-- getSection array start stop =
+
+
+splitInHalf : List a -> Direction -> List a
+splitInHalf a dir =
+    -- half = ( length a ) // 2
+    if dir == Left then
+        firstHalf a
+    else
+        lastHalf a
+
+
+splitArray : List a -> ( List a, List a )
+splitArray a =
+    ( firstHalf a, lastHalf a )
+
+
+mergeArrays aleft aright =
+    []
+
+
+
+{--
+  Merge sort
+--}
+
+
+mergeSort : List a -> List a
+mergeSort a =
+    if List.length a > 1 then
+        mergeArrays (mergeSort (splitInHalf a Left)) (mergeSort (splitInHalf a Right))
+        -- aleft = mergeSort ( splitInHalf a Left )
+        -- aright = mergeSort ( splitInHalf a Right )
+        -- mergeArrays aleft aright
+    else
+        a
+
+
+result =
+    splitArray [ 1, 2, 4, 5, 6 ]
+
+
+main =
+    Html.text (toString result)

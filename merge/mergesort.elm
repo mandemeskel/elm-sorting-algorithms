@@ -13,6 +13,10 @@ unsorted =
     [ 4, 3, 2, 1 ]
 
 
+inf =
+    1 / 0
+
+
 
 -- returns middle and all elements to the left of it
 
@@ -98,24 +102,24 @@ getSubArray array start stop =
 --}
 
 
-mergeSort : List Int -> List Int
+mergeSort : List Float -> List Float
 mergeSort array =
     if List.length array > 1 then
         -- mergeArrays (mergeSort (splitInHalf a Left)) (mergeSort (splitInHalf a Right))
-        -- aleft = mergeSort ( splitInHalf a Left )
-        -- aright = mergeSort ( splitInHalf a Right )
-        -- mergeArrays aleft aright
+        -- a_left = mergeSort ( splitInHalf a Left )
+        -- a_right = mergeSort ( splitInHalf a Right )
+        -- mergeArrays a_left a_right
         let
             len =
                 List.length array
 
-            aleft =
+            a_left =
                 mergeSort (getSubArray array 0 (len // 2))
 
-            aright =
-                mergeSort (getSubArray array (len // 2) 0)
+            a_right =
+                mergeSort (getSubArray array (len // 2) len)
         in
-            mergeArrays aleft aright
+            mergeArrays a_left a_right
     else
         array
 
@@ -128,13 +132,47 @@ lessThan val1 val2 =
         val2
 
 
-mergeArrays : List Int -> List Int -> List Int
-mergeArrays aleft aright =
-    List.map2 lessThan aleft aright
+mergeArrays : List Float -> List Float -> List Float
+mergeArrays a_left a_right =
+    -- List.map2 lessThan a_left a_right
+    -- NOTE: can't use if conditionals in let expressions
+    let
+        l_len =
+            List.length a_left
+
+        r_len =
+            List.length a_right
+
+        l_first =
+            Maybe.withDefault inf (List.head a_left)
+
+        r_first =
+            Maybe.withDefault inf (List.head a_right)
+    in
+        -- if l_len == r_len && l_len == 0 then
+        --     []
+        -- else if l_len == 0 || (List.head a_left) > (List.head a_right) then
+        --     --NOTE: List.singelton is missing, Cannot find variable `List.singleton`, the docs have decieved me
+        --     -- List.append (List.singleton a_right.head) (mergeArrays a_left (List.tail a_right))
+        --     -- NOTE: using List.tail which can return a Maybe causes a tempest of type mistmatche errors
+        --     List.append ([ List.head a_right ]) (mergeArrays a_left (Maybe.withDefault [] (List.tail a_right)))
+        -- else if r_len == 0 || (List.head a_left) <= (List.head a_right) then
+        --     List.append ([ List.head a_left ]) (mergeArrays ((Maybe.withDefault [] (List.tail a_left))) a_right)
+        -- else
+        -- []
+        if l_len == r_len && l_len == 0 then
+            []
+        else if l_len == 0 || l_first > r_first then
+            -- NOTE: need Maybe.withDefault becausse List.tail can return Nothing which would causes an error
+            List.append ([ r_first ]) (mergeArrays a_left (Maybe.withDefault [] (List.tail a_right)))
+        else if r_len == 0 || l_first <= r_first then
+            List.append ([ l_first ]) (mergeArrays ((Maybe.withDefault [] (List.tail a_left))) a_right)
+        else
+            []
 
 
 array =
-    [ 1, 2, 3, 4, 5, 6, 7 ]
+    [ 2, 1, 0, 9, 6, 5, 7, 4, 8, 3, 3 ]
 
 
 start =
@@ -159,14 +197,39 @@ result =
     getSubArray array start stop
 
 
-merged =
-    mergeArrays [ 1, 2, 4 ] [ 0, 3, 5 ]
+
+-- a_left =
+--     [ 1, 2, 4 ]
+--
+--
+-- a_right =
+--     [ 0, 3, 5 ]
+-- len =
+--     List.length array
+--
+--
+-- a_left =
+--     getSubArray array 0 (len // 2)
+--
+--
+-- a_right =
+--     getSubArray array (len // 2) len
+--
+--
+-- merged =
+--     mergeArrays a_left a_right
+
+
+sorted =
+    mergeSort array
 
 
 
--- use ++ to concat strings
+-- NOTE: use ++ to concat strings
 
 
 main =
     -- Html.text ((toString result) ++ " " ++ (toString array))
-    Html.text (toString merged)
+    -- Html.text (toString merged)
+    -- Html.text ("Array: " ++ (toString array) ++ " </br> " ++ "Left: " ++ (toString a_left) ++ " " ++ "Right: " ++ (toString a_right))
+    Html.text ("Array: " ++ (toString array) ++ " </br> " ++ "Sorted: " ++ (toString sorted))

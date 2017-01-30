@@ -22,7 +22,7 @@ insertionSort lst =
                 List.tail lst
 
             n2 =
-                insertionSort tail_lst
+                insertionSort (Maybe.withDefault [] tail_lst)
         in
             if List.length n2 == 0 then
                 n1
@@ -31,12 +31,13 @@ insertionSort lst =
 
 
 mergeList lst1 list2 =
-    case list1 of
+    case lst1 of
         [] ->
             if List.length list2 == 0 then
-              []
+                []
             else
-              [ list2[0] ]
+                [ list2 [ 0 ] ]
+
         [ x ] ->
             if List.length list2 == 0 then
                 [ x ]
@@ -44,6 +45,10 @@ mergeList lst1 list2 =
                 [ x ]
             else
                 [ list2 [ 0 ] ]
-        x::y ->
-          let
-            merged mergeList 
+
+        x :: y ->
+            let
+                merged =
+                    mergeList lst1 list2
+            in
+                merged
